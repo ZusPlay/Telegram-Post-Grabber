@@ -1,0 +1,12 @@
+.idea/
+__pycache__/
+
+# Security
+config.json
+*.session
+
+# Other
+Procfile
+requirements.txt
+runtime.txt
+start.bat

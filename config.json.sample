@@ -1,0 +1,17 @@
+{
+  "client": {
+    "api_id": 0,
+    "api_hash": ""
+  },
+  "bot": {
+    "token": "",
+    "all_ID": [],
+    "message": "Скрипт запущен!"
+  },
+  "settings": {
+    "my_channels": [],
+    "chats": [],
+    "timer": 0,
+    "ban_words": []
+  }
+}
