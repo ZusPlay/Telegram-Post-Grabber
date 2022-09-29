@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
+import re
 import json
 import requests
 from time import sleep
+from os.path import abspath
 from urllib.parse import quote_plus
 from telethon import TelegramClient, events
 
-with open('config.json', encoding='utf-8') as f:
+with open(abspath('config.json'), encoding='utf-8') as f:
     config = json.load(f)
 
 if not (config['client']['api_id'] or config['client']['api_hash']
@@ -20,6 +22,13 @@ def has_ban_words(text, ban_words):
     sbuf = set(text_words)
     result = [x for x in ban_words if x in sbuf]
     return bool(result)
+
+
+def has_ban_symbols(text, ban_symbols):
+    if len(ban_symbols) == 0:
+        return False
+    pattern = '(?:{})'.format('|'.join(ban_symbols))
+    return bool(re.search(pattern, text, flags=re.I))
 
 
 def send_message(message):
@@ -37,13 +46,17 @@ send_message(config['bot']['message'])
 
 try:
     client = TelegramClient("Grabber", config['client']['api_id'], config['client']['api_hash'])
-    client.start()  # client start
+    client.start()
 
 
     @client.on(events.NewMessage(chats=config['settings']['chats']))
     async def normal_handler(event):
         # if isinstance(event.chat, types.Channel):
-        if not has_ban_words(str(event.message.message), config['settings']['ban_words']):
+
+        has_bw = has_ban_words(str(event.message.message), config['settings']['ban_words'])
+        has_bs = has_ban_symbols(str(event.message.message), config['settings']['ban_symbols'])
+
+        if not has_bw and not has_bs:
             sleep(config['settings']['timer'])
             for channel in config['settings']['my_channels']:
                 await client.send_message(channel, event.message)
