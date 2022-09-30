@@ -14,7 +14,7 @@
   "bot": {
     "token": "",
     "all_ID": [],
-    "message": "Скрипт запущен!"
+    "message": ""
   },
   "settings": {
     "my_channels": [],
