@@ -8,6 +8,5 @@ config.json
 
 # Other
 Procfile
-requirements.txt
 runtime.txt
 start.bat
