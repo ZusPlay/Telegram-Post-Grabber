@@ -10,3 +10,5 @@ config.json
 Procfile
 runtime.txt
 start.bat
+Grabber.session-journal
+config.staging.sample
