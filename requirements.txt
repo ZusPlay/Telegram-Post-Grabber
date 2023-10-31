@@ -6,4 +6,4 @@ pyasn1==0.4.8
 requests==2.28.1
 rsa==4.9
 Telethon==1.25.4
-urllib3==1.26.12
+urllib3==1.26.18
