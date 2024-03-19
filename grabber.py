@@ -45,13 +45,22 @@ print(config['bot']['message'])
 send_message(config['bot']['message'])
 
 try:
-    client = TelegramClient("Grabber", config['client']['api_id'], config['client']['api_hash'])
+    client: TelegramClient = TelegramClient("Grabber", config['client']['api_id'], config['client']['api_hash'])
     client.start()
 
 
+    @client.on(events.Album(chats=config['settings']['chats']))
+    async def album_handler(event: events.Album.Event):
+        sleep(config['settings']['timer'])
+        for channel in config['settings']['my_channels']:
+            await client.send_message(channel, file=event.messages, message=event.original_update.message.message)
+            sleep(1)
+
+
     @client.on(events.NewMessage(chats=config['settings']['chats']))
-    async def normal_handler(event):
-        # if isinstance(event.chat, types.Channel):
+    async def normal_handler(event: events.NewMessage.Event):
+        if event.message.media and event.grouped_id is None:
+            return
 
         has_bw = has_ban_words(str(event.message.message), config['settings']['ban_words'])
         has_bs = has_ban_symbols(str(event.message.message), config['settings']['ban_symbols'])
