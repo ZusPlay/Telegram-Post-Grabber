@@ -59,7 +59,7 @@ try:
 
     @client.on(events.NewMessage(chats=config['settings']['chats']))
     async def normal_handler(event: events.NewMessage.Event):
-        if event.message.media and event.grouped_id is None:
+        if event.message.media and event.grouped_id is not None:
             return
 
         has_bw = has_ban_words(str(event.message.message), config['settings']['ban_words'])
@@ -70,7 +70,6 @@ try:
             for channel in config['settings']['my_channels']:
                 await client.send_message(channel, event.message)
                 sleep(1)
-
 
     client.run_until_disconnected()
 except Exception as error:
