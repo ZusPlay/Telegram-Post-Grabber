@@ -1,6 +1,7 @@
 .idea/
 __pycache__/
 .venv/
+venv/
 
 # Security
 config.json
@@ -9,6 +10,7 @@ config.json
 # Other
 Procfile
 runtime.txt
+prompt.txt
 start.bat
 Grabber.session-journal
 config.staging.sample
