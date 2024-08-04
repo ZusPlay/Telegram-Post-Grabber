@@ -6,6 +6,7 @@ from time import sleep
 from os.path import abspath
 from urllib.parse import quote_plus
 from telethon import TelegramClient, events
+from telethon.sessions import StringSession
 import openai
 
 # Read config file
@@ -15,21 +16,20 @@ with open(abspath('config.json'), encoding='utf-8') as f:
 # Check if config file is empty
 if not (config['client']['api_id'] or config['client']['api_hash']
         or config['settings']['my_channels'] or config['settings']['chats']):
-    print('Ошибка! Вы забыли что-то заполнить в настройках (config.json). Заполните их для нормальной работы.')
-    input()
+    print('Error! You missed something in the settings (config.json). Fill it out for proper operation.')
     exit()
 
-# read prompt from prompt.txt file
+# Read prompt from prompt.txt file
 with open(abspath('prompt.txt'), encoding='utf-8') as f:
     edit_prompt = f.read().strip()
 
-# init OpenAI API
+# Init OpenAI API
 openai.api_key = config['openai']['api_key']
 
-def has_ban_words(text, ban_words):
+def has_ban_phrases(text, ban_phrases):
     text_words = ' '.join(text.split('\n')).split(' ')
     sbuf = set(text_words)
-    result = [x for x in ban_words if x in sbuf]
+    result = [x for x in ban_phrases if x in sbuf]
     return bool(result)
 
 def has_ban_symbols(text, ban_symbols):
@@ -56,13 +56,13 @@ def edit_message(text):
         ],
         max_tokens=500
     )
-    return response.choices[0].message['content'].strip()
+    return response.choices[0].message.content.strip()
 
 print(config['bot']['message'])
 send_message(config['bot']['message'])
 
 try:
-    client: TelegramClient = TelegramClient("Grabber", config['client']['api_id'], config['client']['api_hash'])
+    client = TelegramClient(StringSession(config['client']['string_session']), config['client']['api_id'], config['client']['api_hash'])
     client.start()
 
     @client.on(events.Album(chats=config['settings']['chats']))
@@ -78,7 +78,7 @@ try:
         if event.message.media and event.grouped_id is not None:
             return
 
-        has_bw = has_ban_words(str(event.message.message), config['settings']['ban_words'])
+        has_bw = has_ban_phrases(str(event.message.message), config['settings']['ban_phrases'])
         has_bs = has_ban_symbols(str(event.message.message), config['settings']['ban_symbols'])
 
         if not has_bw and not has_bs:
@@ -93,6 +93,6 @@ try:
 
     client.run_until_disconnected()
 except Exception as error:
-    send_message(str(f'Произошла какая-то ошибка...\n\n{error}'))
+    send_message(str(f'An error occurred...\n\n{error}'))
     print(error)
     print('\n')
