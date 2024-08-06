@@ -27,9 +27,23 @@ with open(abspath('prompt.txt'), encoding='utf-8') as f:
 openai.api_key = config['openai']['api_key']
 
 def has_ban_phrases(text, ban_phrases):
-    text_words = ' '.join(text.split('\n')).split(' ')
+    # Split text into words, preserving spaces for multi-word phrase checks
+    text_lines = text.split('\n')
+    text_words = ' '.join(text_lines).split(' ')
+    
+    # Create a set of unique words for quick lookup
     sbuf = set(text_words)
-    result = [x for x in ban_phrases if x in sbuf]
+    
+    # Check for single words in the text
+    single_word_bans = [x for x in ban_phrases if ' ' not in x and x in sbuf]
+    
+    # Check for multi-word phrases in the text
+    multi_word_bans = [x for x in ban_phrases if ' ' in x and x in text]
+    
+    # Combine results from single words and multi-word phrases
+    result = single_word_bans + multi_word_bans
+    
+    print(f'Ban phrases found: {result}')
     return bool(result)
 
 def has_ban_symbols(text, ban_symbols):
@@ -94,5 +108,4 @@ try:
     client.run_until_disconnected()
 except Exception as error:
     send_message(str(f'An error occurred...\n\n{error}'))
-    print(error)
-    print('\n')
+    print(f'Error: {error}')
