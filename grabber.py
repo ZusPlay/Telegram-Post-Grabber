@@ -100,7 +100,7 @@ try:
 
     @client.on(events.NewMessage(chats=config['settings']['chats']))
     async def normal_handler(event: events.NewMessage.Event):
-        print(f"Handling new message event: {event}")
+        print(f"Handling new message event...")
         if event.message.media and event.grouped_id is not None:
             print("Message is part of an album, skipping...")
             return
@@ -111,12 +111,13 @@ try:
         if not has_bw and not has_bs:
             print("Message passed ban checks.")
             sleep(config['settings']['timer'])
+            edited_text = edit_message(event.message.message)
+            
             for channel in config['settings']['my_channels']:
                 print(f"Forwarding message to channel: {channel}")
                 await client.send_message(channel, event.message)
                 sleep(1)
-                edited_text = edit_message(event.message.message)
-                print(f"Sending edited message to channel: {channel}")
+                print(f"Sending edited message to channel")
                 await client.send_message(channel, edited_text)
                 sleep(1)
 
