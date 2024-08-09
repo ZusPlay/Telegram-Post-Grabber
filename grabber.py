@@ -90,10 +90,10 @@ try:
 
         if not has_bw and not has_bs:
             sleep(config['settings']['timer'])
+            edited_text = edit_message(event.message.message)
             for channel in config['settings']['my_channels']:
                 await client.send_message(channel, event.message)
                 sleep(1)
-                edited_text = edit_message(event.message.message)
                 await client.send_message(channel, edited_text)
                 sleep(1)
 
