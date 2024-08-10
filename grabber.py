@@ -7,7 +7,6 @@ from os.path import abspath
 from urllib.parse import quote_plus
 from telethon import TelegramClient, events
 from telethon.sessions import StringSession
-import openai
 import logging
 from datetime import datetime
 
@@ -27,9 +26,6 @@ if not (config['client']['api_id'] or config['client']['api_hash']
 # Read prompt from prompt.txt file
 with open(abspath('prompt.txt'), encoding='utf-8') as f:
     edit_prompt = f.read().strip()
-
-# Init OpenAI API
-openai.api_key = config['openai']['api_key']
 
 def has_ban_phrases(text, ban_phrases):
     text_lines = text.split('\n')
@@ -55,17 +51,6 @@ def send_message(message):
                     user_id) + "&text=" + str(url_message)
             ).json()
 
-def edit_message(text):
-    response = openai.chat.completions.create(
-        model="gpt-3.5-turbo",
-        messages=[
-            {"role": "system", "content": edit_prompt},
-            {"role": "user", "content": text}
-        ],
-        max_tokens=500
-    )
-    return response.choices[0].message.content.strip()
-
 logging.info(config['bot']['message'])
 send_message(config['bot']['message'])
 
@@ -90,11 +75,8 @@ try:
 
         if not has_bw and not has_bs:
             sleep(config['settings']['timer'])
-            edited_text = edit_message(event.message.message)
             for channel in config['settings']['my_channels']:
                 await client.send_message(channel, event.message)
-                sleep(1)
-                await client.send_message(channel, edited_text)
                 sleep(1)
 
     client.run_until_disconnected()
