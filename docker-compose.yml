@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  grabber:
+    build: .
+    container_name: grabber
+    ports:
+      - "80:80"  # Adjust the ports if needed
+    restart: always
+    volumes:
+      - .:/grabber  # This mounts the current directory to /grabber in the container
